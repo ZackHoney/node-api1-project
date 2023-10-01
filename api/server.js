@@ -16,9 +16,25 @@ server.get('/api/users', async (req, res) => {
             data: user
         })
         
-    } catch {
+    } catch(err) {
         res.status(500).json({
-            message: res.message
+            message: err.message
+        })
+    }
+})
+
+server.get('/api/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        const user = await User.findById(id)
+        if(!user) {
+            res.status(401).json({ message: `No user with the id of ${id} can be found `})
+        } else {
+            res.status(200).json(user)
+        }
+    } catch(err) {
+        res.status(500).json({
+            message: err.message
         })
     }
 })
