@@ -4,10 +4,17 @@ const User = require('./users/model')
 const server = express();
 server.use(express.json())
 
-server.get('/api/users', (req, res) => {
+server.get('/hello-world', (req, res) => {
+    res.status(200).json({ message: 'hello world' })
+});
+
+server.get('/api/users', async (req, res) => {
     try {
-        const user = User.find()
-        res.status(200).json(user)
+        const user =  await User.find()
+        res.status(200).json({
+            message: "You have retrieved users!",
+            data: user
+        })
         
     } catch {
         res.status(500).json({
