@@ -11,10 +11,7 @@ server.get('/hello-world', (req, res) => {
 server.get('/api/users', async (req, res) => {
     try {
         const user =  await User.find()
-        res.status(200).json({
-            message: "You have retrieved users!",
-            data: user
-        })
+        res.status(200).json(user)
         
     } catch(err) {
         res.status(500).json({
@@ -28,9 +25,74 @@ server.get('/api/users/:id', async (req, res) => {
         const { id } = req.params
         const user = await User.findById(id)
         if(!user) {
-            res.status(401).json({ message: `No user with the id of ${id} can be found `})
+            res.status(404).json({ message: 'does not exist'})
         } else {
             res.status(200).json(user)
+        }
+    } catch(err) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
+})
+
+
+server.post('/api/users', async (req, res) => {
+    try {
+        const { name, bio } = req.body
+        if(!name || !bio) {
+            res.status(400).json({
+                message: 'provide name and bio'
+            })
+        } else {
+            const createdUser = await User.insert({ name, bio})
+            res.status(201).json(createdUser)
+        }
+    } catch(err) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
+})
+
+
+server.put('/api/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        const { name, bio } = req.body
+        if(!name || ! bio) {
+            res.status(400).json({
+                message: 'provide name and bio'
+            })
+        } else {
+            const changedUser = await User.update(id, {name, bio})
+            if(!changedUser) {
+                res.status(404).json({
+                    message: 'does not exist'
+                })
+            } else {
+                res.status(200).json(
+                 changedUser
+                )
+            }
+        }
+    } catch(err) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
+})
+
+server.delete('/api/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        const deletedUser = await User.remove(id)
+        if(!deletedUser) {
+            res.status(404).json({
+                message: 'does not exist'
+            })
+        } else {
+            res.status(200).json(deletedUser)
         }
     } catch(err) {
         res.status(500).json({
